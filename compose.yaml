@@ -1,0 +1,9 @@
+version: '3.9'
+
+services:
+    most:
+        restart: on-failure:5
+        image: mattermost/mattermost-preview:9.3.0
+        container_name: dev-most
+        ports:
+            - 8065:8065
