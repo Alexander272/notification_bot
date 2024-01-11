@@ -1,0 +1,4 @@
+environment: 'dev'
+
+http:
+    port: 8754

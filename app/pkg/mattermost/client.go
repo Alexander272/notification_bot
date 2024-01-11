@@ -15,6 +15,7 @@ type Client struct {
 	Socket *model.WebSocketClient
 }
 
+// может разделить клиенты и отдельно подключать http и websocket
 func NewMattermostClient(conf Config) *Client {
 	httpClient := model.NewAPIv4Client("http://" + conf.ServerLink)
 	httpClient.SetToken(conf.Token)
