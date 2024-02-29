@@ -10,11 +10,12 @@ type Services struct {
 type Deps struct {
 	MostClient *model.Client4
 	BotName    string
+	AppUrl     string
 }
 
 func NewServices(deps Deps) *Services {
 	channel := NewChannelService(deps.MostClient, deps.BotName)
-	message := NewMessageService(deps.MostClient, channel)
+	message := NewMessageService(deps.MostClient, deps.AppUrl, channel)
 
 	return &Services{
 		Channel: channel,

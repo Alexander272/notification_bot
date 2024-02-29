@@ -36,10 +36,16 @@ func main() {
 	}
 	mostClient := mattermost.NewMattermostClient(mattermostConf)
 
+	_, _, err = mostClient.Http.GetPing()
+	if err != nil {
+		logger.Fatalf("failed to ping most. error: %s", err.Error())
+	}
+
 	//* Services, Repos & API Handlers
 	servicesDeps := services.Deps{
 		MostClient: mostClient.Http,
 		BotName:    conf.Most.BotName,
+		AppUrl:     conf.Most.AppLink,
 	}
 	services := services.NewServices(servicesDeps)
 	handlers := transport.NewHandler(services)
