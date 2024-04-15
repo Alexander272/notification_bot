@@ -15,13 +15,12 @@ import (
 	transport "github.com/Alexander272/si_bot/internal/transport/http"
 	"github.com/Alexander272/si_bot/pkg/logger"
 	"github.com/Alexander272/si_bot/pkg/mattermost"
-	"github.com/subosito/gotenv"
 )
 
 func main() {
-	if err := gotenv.Load(".env"); err != nil {
-		logger.Fatalf("failed to load env variables. error: %s", err.Error())
-	}
+	// if err := gotenv.Load(".env"); err != nil {
+	// 	logger.Fatalf("failed to load env variables. error: %s", err.Error())
+	// }
 
 	conf, err := config.Init("configs/config.yaml")
 	if err != nil {
@@ -45,7 +44,6 @@ func main() {
 	servicesDeps := services.Deps{
 		MostClient: mostClient.Http,
 		BotName:    conf.Most.BotName,
-		AppUrl:     conf.Most.AppLink,
 	}
 	services := services.NewServices(servicesDeps)
 	handlers := transport.NewHandler(services)

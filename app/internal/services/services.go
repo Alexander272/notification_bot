@@ -4,21 +4,23 @@ import "github.com/mattermost/mattermost-server/v6/model"
 
 type Services struct {
 	Channel
-	Message
+	Post
+	Dialog
 }
 
 type Deps struct {
 	MostClient *model.Client4
 	BotName    string
-	AppUrl     string
 }
 
 func NewServices(deps Deps) *Services {
 	channel := NewChannelService(deps.MostClient, deps.BotName)
-	message := NewMessageService(deps.MostClient, deps.AppUrl, channel)
+	post := NewPostService(deps.MostClient, channel)
+	dialog := NewDialogService(deps.MostClient)
 
 	return &Services{
 		Channel: channel,
-		Message: message,
+		Post:    post,
+		Dialog:  dialog,
 	}
 }

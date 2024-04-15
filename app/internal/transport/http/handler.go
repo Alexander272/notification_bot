@@ -3,7 +3,8 @@ package http
 import (
 	"github.com/Alexander272/si_bot/internal/config"
 	"github.com/Alexander272/si_bot/internal/services"
-	"github.com/Alexander272/si_bot/internal/transport/http/message"
+	"github.com/Alexander272/si_bot/internal/transport/http/dialogs"
+	"github.com/Alexander272/si_bot/internal/transport/http/posts"
 	"github.com/Alexander272/si_bot/pkg/limiter"
 	"github.com/gin-gonic/gin"
 )
@@ -27,8 +28,8 @@ func (h *Handler) Init(conf *config.Config) *gin.Engine {
 
 	api := router.Group("/api")
 
-	// TODO init api
-	message.Register(api, h.services.Message)
+	posts.Register(api, h.services.Post)
+	dialogs.Register(api, h.services.Dialog)
 
 	return router
 }

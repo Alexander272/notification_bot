@@ -2,6 +2,7 @@ package mattermost
 
 import (
 	"github.com/mattermost/mattermost-server/v6/model"
+	"github.com/sirupsen/logrus"
 )
 
 type Config struct {
@@ -19,13 +20,13 @@ func NewMattermostClient(conf Config) *Client {
 	httpClient := model.NewAPIv4Client("https://" + conf.ServerLink)
 	httpClient.SetToken(conf.Token)
 
-	// socketClient, err := model.NewWebSocketClient4("ws://"+conf.ServerLink, conf.Token)
-	// if err != nil {
-	// 	logrus.Fatalf("failed to websocket connect to mattermost. error: %s", err.Error())
-	// }
+	socketClient, err := model.NewWebSocketClient("wss://"+conf.ServerLink, conf.Token)
+	if err != nil {
+		logrus.Fatalf("failed to websocket connect to mattermost. error: %s", err.Error())
+	}
 
 	return &Client{
-		Http: httpClient,
-		// Socket: socketClient,
+		Http:   httpClient,
+		Socket: socketClient,
 	}
 }

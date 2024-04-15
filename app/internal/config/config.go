@@ -30,10 +30,10 @@ type (
 	}
 
 	MostConfig struct {
-		AppLink    string `env:"APP_LINK"`
-		ServerLink string `env:"MOST_SERVER"`
-		Token      string `env:"MOST_TOKEN"`
-		BotName    string `env:"MOST_BOT_NAME"`
+		AppLink    string `env:"BOT_APP_LINK"`
+		ServerLink string `env:"BOT_SERVER"`
+		Token      string `env:"BOT_TOKEN"`
+		BotName    string `env:"BOT_NAME"`
 	}
 )
 
