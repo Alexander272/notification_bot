@@ -7,6 +7,7 @@ import (
 	"github.com/Alexander272/si_bot/internal/models/response"
 	"github.com/Alexander272/si_bot/internal/services"
 	"github.com/Alexander272/si_bot/pkg/error_bot"
+	"github.com/Alexander272/si_bot/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
@@ -35,6 +36,7 @@ func (h *DialogsHandler) create(c *gin.Context) {
 		response.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Отправлены некорректные данные")
 		return
 	}
+	logger.Info("userId", dto.UserId)
 
 	if err := h.service.Open(c, dto); err != nil {
 		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка. "+err.Error())

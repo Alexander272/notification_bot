@@ -29,14 +29,19 @@ func (s *PostService) SendPost(ctx context.Context, data models.CreatePostDTO) e
 	post := &model.Post{
 		ChannelId: data.ChannelId,
 		Message:   data.Message,
+		IsPinned:  data.IsPinned,
 	}
 
-	if data.UserId != "" {
+	if data.UserId != "" && post.ChannelId == "" {
 		channelId, err := s.channel.Create(ctx, data.UserId)
 		if err != nil {
 			return err
 		}
 		post.ChannelId = channelId
+	}
+
+	if post.ChannelId == "" {
+		return fmt.Errorf("ChannelId is empty")
 	}
 
 	if data.Actions != nil {
@@ -53,6 +58,19 @@ func (s *PostService) SendPost(ctx context.Context, data models.CreatePostDTO) e
 		post.AddProp(p.Key, p.Value)
 	}
 
+	if data.IsPinned {
+		dataId := post.GetProp("data_id")
+		if dataId != nil {
+			req := &models.GetPost{
+				ChannelId: post.ChannelId,
+				DataId:    dataId.(string),
+			}
+			if err := s.findDuplicate(req); err != nil {
+				return fmt.Errorf("failed to find duplicate. error: %w", err)
+			}
+		}
+	}
+
 	//TODO
 	// можно передавать ID поста. выполнять поиск в канале этого ID, если он есть удалять сообщение и отправлять новое
 	// благодаря такой схеме можно избежать варианта, когда в канале три одинаковых сообщений (для получения инструмента) с разной датой, а изменяться по нажатию будет только последнее
@@ -64,6 +82,25 @@ func (s *PostService) SendPost(ctx context.Context, data models.CreatePostDTO) e
 	if err != nil {
 		return fmt.Errorf("failed to create post. error: %w", err)
 	}
+	return nil
+}
+func (s *PostService) findDuplicate(req *models.GetPost) error {
+	posts, _, err := s.MostClient.GetPinnedPosts(req.ChannelId, "")
+	if err != nil {
+		return fmt.Errorf("failed to get pinned posts. error: %w", err)
+	}
+
+	//TODO надо наверное и частичное совпадение проверять
+	for _, p := range posts.Posts {
+		if p.GetProp("data_id") == req.DataId {
+			_, err := s.MostClient.DeletePost(p.Id)
+			if err != nil {
+				return fmt.Errorf("failed to delete post. error: %w", err)
+			}
+			break
+		}
+	}
+
 	return nil
 }
 
@@ -91,7 +128,7 @@ func (s *PostService) UpdatePost(ctx context.Context, data models.UpdatePostDTO)
 
 	_, _, err := s.MostClient.UpdatePost(data.PostId, post)
 	if err != nil {
-		return fmt.Errorf("failed to create post. error: %w", err)
+		return fmt.Errorf("failed to update post. error: %w", err)
 	}
 	return nil
 }

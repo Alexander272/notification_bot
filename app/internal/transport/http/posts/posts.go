@@ -7,6 +7,7 @@ import (
 	"github.com/Alexander272/si_bot/internal/models/response"
 	"github.com/Alexander272/si_bot/internal/services"
 	"github.com/Alexander272/si_bot/pkg/error_bot"
+	"github.com/Alexander272/si_bot/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
@@ -36,7 +37,9 @@ func (h *PostHandlers) create(c *gin.Context) {
 		response.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Отправлены некорректные данные")
 		return
 	}
+	logger.Info("userId", dto.UserId)
 
+	//TODO может стоит попытаться как-нибудь определять какой пользователь вызвал тот или иной запрос
 	if err := h.service.SendPost(c, dto); err != nil {
 		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка. "+err.Error())
 		error_bot.Send(c, err.Error(), dto)

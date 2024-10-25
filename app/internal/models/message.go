@@ -6,6 +6,7 @@ type CreatePostDTO struct {
 	UserId      string                   `json:"userId"`
 	ChannelId   string                   `json:"channelId"`
 	Message     string                   `json:"message" binding:"required"`
+	IsPinned    bool                     `json:"isPinned"`
 	Props       []*Props                 `json:"props"`
 	Actions     []*model.PostAction      `json:"actions"`
 	Attachments []*model.SlackAttachment `json:"attachments"`
@@ -16,6 +17,11 @@ type UpdatePostDTO struct {
 	Props       []*Props                 `json:"props"`
 	Actions     []*model.PostAction      `json:"actions"`
 	Attachments []*model.SlackAttachment `json:"attachments"`
+}
+
+type GetPost struct {
+	ChannelId string `json:"channelId"`
+	DataId    string `json:"dataId"`
 }
 
 type Props struct {
