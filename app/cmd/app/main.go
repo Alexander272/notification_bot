@@ -18,7 +18,7 @@ import (
 )
 
 func main() {
-	// if err := gotenv.Load(".env"); err != nil {
+	// if err := gotenv.Load("../.env"); err != nil {
 	// 	logger.Fatalf("failed to load env variables. error: %s", err.Error())
 	// }
 
