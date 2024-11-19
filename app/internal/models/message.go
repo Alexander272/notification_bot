@@ -21,6 +21,7 @@ type UpdatePostDTO struct {
 
 type GetPost struct {
 	ChannelId string `json:"channelId"`
+	DataType  string `json:"dataType"`
 	DataId    string `json:"dataId"`
 }
 

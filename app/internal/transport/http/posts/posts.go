@@ -37,7 +37,7 @@ func (h *PostHandlers) create(c *gin.Context) {
 		response.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Отправлены некорректные данные")
 		return
 	}
-	logger.Info("userId", dto.UserId)
+	logger.Info("create post ", "userId: ", dto.UserId, " channelId: ", dto.ChannelId, " message: ", dto.Message)
 
 	//TODO может стоит попытаться как-нибудь определять какой пользователь вызвал тот или иной запрос
 	if err := h.service.SendPost(c, dto); err != nil {

@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/Alexander272/si_bot/internal/models"
 	"github.com/mattermost/mattermost-server/v6/model"
@@ -60,9 +61,12 @@ func (s *PostService) SendPost(ctx context.Context, data models.CreatePostDTO) e
 
 	if data.IsPinned {
 		dataId := post.GetProp("data_id")
+		dataType := post.GetProp("data_type")
+
 		if dataId != nil {
 			req := &models.GetPost{
 				ChannelId: post.ChannelId,
+				DataType:  dataType.(string),
 				DataId:    dataId.(string),
 			}
 			if err := s.findDuplicate(req); err != nil {
@@ -90,14 +94,42 @@ func (s *PostService) findDuplicate(req *models.GetPost) error {
 		return fmt.Errorf("failed to get pinned posts. error: %w", err)
 	}
 
-	//TODO надо наверное и частичное совпадение проверять
+	dataIds := models.Universe{}
+	if req.DataType == "array" {
+		dataIds = models.NewUniverse(strings.Split(req.DataId, ","))
+	}
+
 	for _, p := range posts.Posts {
-		if p.GetProp("data_id") == req.DataId {
+		if req.DataType == "array" {
+			if p.GetProp("data_id") == nil {
+				continue
+			}
+
+			tmp := p.GetProp("data_id").(string)
+			data := models.NewUniverse(strings.Split(tmp, ","))
+			ok := false
+			if len(data) > len(dataIds) {
+				ok = data.ContainSet(strings.Split(req.DataId, ","))
+			} else {
+				ok = dataIds.ContainSet(strings.Split(tmp, ","))
+			}
+
+			if !ok {
+				continue
+			}
 			_, err := s.MostClient.DeletePost(p.Id)
 			if err != nil {
 				return fmt.Errorf("failed to delete post. error: %w", err)
 			}
 			break
+		} else {
+			if p.GetProp("data_id") == req.DataId {
+				_, err := s.MostClient.DeletePost(p.Id)
+				if err != nil {
+					return fmt.Errorf("failed to delete post. error: %w", err)
+				}
+				break
+			}
 		}
 	}
 
